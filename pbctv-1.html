@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PBC&.TV</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Space+Mono:wght@400;700&display=swap');
+
+  :root{
+    --bg:#07080B; --bg2:#0E1015; --card:#14161D; --cardBorder:#22252F;
+    --gold:#F5B400; --goldDim:#B98A12; --blue:#1E63E0; --blueDim:#13418F;
+    --red:#E6304A; --cream:#F4EFE3; --muted:#8B90A0; --faint:#454956;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--cream);font-family:'Libre Baskerville',serif;}
+  input::placeholder{color:var(--faint);}
+  a{color:inherit;}
+
+  /* ---------- top bar ---------- */
+  .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--bg) 60%,transparent);backdrop-filter:blur(6px);}
+  .topbar-inner{max-width:1200px;margin:0 auto;padding:14px 24px 10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:22px;letter-spacing:.5px;margin:0;text-transform:uppercase;}
+  .brand h1 .gold{color:var(--gold);text-shadow:0 0 14px rgba(245,180,0,.35);}
+  .brand h1 .blue{color:var(--blue);}
+  .searchwrap{display:flex;align-items:center;gap:8px;width:300px;max-width:100%;}
+  .searchbox{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--cardBorder);border-radius:20px;padding:8px 14px;flex:1;}
+  .searchbox input{flex:1;background:transparent;border:none;outline:none;color:var(--cream);font-family:'Libre Baskerville',serif;font-size:13px;}
+  .icon-btn{width:34px;height:34px;min-width:34px;border-radius:50%;border:1px solid var(--cardBorder);background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);}
+  .icon-btn.active{border-color:var(--gold);background:var(--gold);color:#0A0A0C;}
+  .filters{max-width:1200px;margin:0 auto;padding:0 24px 12px;display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{font-family:'Space Mono',monospace;font-size:11px;padding:7px 14px;border-radius:20px;border:1px solid var(--cardBorder);background:transparent;color:var(--muted);cursor:pointer;}
+  .chip.active{border-color:var(--gold);background:var(--gold);color:#0A0A0C;font-weight:700;}
+  select{font-family:'Space Mono',monospace;font-size:12px;background:var(--bg2);color:var(--cream);border:1px solid var(--cardBorder);border-radius:20px;padding:9px 10px;outline:none;cursor:pointer;}
+
+  .tester{max-width:1200px;margin:0 auto;padding:0 24px 14px;display:none;}
+  .tester.open{display:block;}
+  .tester-box{background:var(--bg2);border:1px solid var(--cardBorder);border-radius:8px;padding:12px 16px;}
+  .tester-box p{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);margin:0 0 8px;}
+  .tester-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .tester-row input{flex:1;min-width:200px;background:var(--bg);border:1px solid var(--cardBorder);border-radius:4px;padding:9px 12px;color:var(--cream);font-family:'Space Mono',monospace;font-size:12px;outline:none;}
+  .btn-gold{display:flex;align-items:center;gap:6px;background:var(--gold);color:#0A0A0C;border:none;border-radius:4px;padding:9px 16px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;height:58vh;min-height:380px;overflow:hidden;background:#0A0B10;}
+  .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .hero .fade{position:absolute;inset:0;background:linear-gradient(0deg,var(--bg) 5%,rgba(7,8,11,.55) 45%,rgba(7,8,11,.15) 75%),linear-gradient(90deg,rgba(7,8,11,.88) 10%,transparent 65%);}
+  .hero-content{position:absolute;left:0;bottom:0;padding:0 28px 34px;max-width:560px;}
+  .eyebrow{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:3px;}
+  .hero-content h2{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(30px,5vw,48px);margin:10px 0 12px;line-height:1.02;text-shadow:0 4px 20px rgba(0,0,0,.6);}
+  .hero-meta{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+  .hero-desc{font-size:14px;line-height:1.6;opacity:.9;margin:0 0 20px;}
+  .hero-actions{display:flex;gap:10px;}
+  .btn-cream{display:flex;align-items:center;gap:8px;background:var(--cream);color:#0A0A0C;border:none;border-radius:3px;padding:11px 22px;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;}
+  .btn-outline{display:flex;align-items:center;gap:8px;background:rgba(139,144,160,.22);color:var(--cream);border:1px solid var(--cardBorder);border-radius:3px;padding:11px 22px;font-family:'Space Mono',monospace;font-size:13px;cursor:pointer;}
+
+  /* ---------- badges ---------- */
+  .badge{display:flex;align-items:center;gap:4px;border-radius:4px;padding:3px 7px;font-family:'Space Mono',monospace;font-size:12px;}
+  .badge-rating{background:rgba(7,8,11,.8);border:1px solid rgba(245,180,0,.35);color:var(--gold);}
+  .badge-live{background:var(--red);color:#fff;box-shadow:0 0 12px rgba(230,48,74,.55);}
+  .badge-pd{background:rgba(30,99,224,.9);color:#fff;font-weight:700;}
+  .badge-type{border-radius:3px;padding:3px 6px;color:#0A0A0C;font-weight:700;text-transform:uppercase;font-size:10px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:#fff;display:inline-block;position:relative;}
+  .dot::after{content:"";position:absolute;inset:0;border-radius:50%;background:#fff;opacity:.6;animation:pulseLive 1.4s ease-out infinite;}
+  @keyframes pulseLive{0%{transform:scale(1);opacity:.6;}100%{transform:scale(2.6);opacity:0;}}
+
+  /* ---------- rows / cards ---------- */
+  main{max-width:1200px;margin:0 auto;padding:10px 24px 60px;}
+  .row-section{margin-bottom:28px;}
+  .row-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 4px;}
+  .row-head h3{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin:0;}
+  .row-nav{display:flex;gap:6px;}
+  .row-nav button{width:26px;height:26px;border-radius:50%;border:1px solid var(--cardBorder);background:var(--bg2);color:var(--muted);cursor:pointer;}
+  .row-scroll{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;}
+  .row-scroll::-webkit-scrollbar{height:6px;}
+  .row-scroll::-webkit-scrollbar-thumb{background:var(--cardBorder);border-radius:3px;}
+
+  .grid{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;}
+
+  .card{min-width:168px;width:168px;background:var(--card);border:1px solid var(--cardBorder);border-radius:6px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;flex-shrink:0;scroll-snap-align:start;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+  .card:hover{transform:translateY(-5px) scale(1.02);}
+  .card-media{position:relative;height:232px;background:#0A0B10;}
+  .card-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .card-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,8,11,.05) 40%,rgba(7,8,11,.85) 100%);}
+  .card-top-right{position:absolute;top:7px;right:7px;}
+  .card-top-left{position:absolute;top:7px;left:7px;}
+  .card-play{position:absolute;bottom:8px;right:8px;width:34px;height:34px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.5);}
+  .card-title{position:absolute;bottom:8px;left:9px;right:44px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 6px rgba(0,0,0,.8);}
+  .card-info{padding:8px 10px 10px;display:flex;gap:6px;align-items:center;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
+  .card-info .sep{color:var(--faint);}
+  .card-info span.trunc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  .empty{border:1px dashed var(--cardBorder);border-radius:4px;padding:60px 20px;text-align:center;margin-top:14px;}
+  .empty h4{font-family:'Oswald',sans-serif;color:var(--muted);font-size:18px;text-transform:uppercase;letter-spacing:1px;}
+  .empty p{color:var(--faint);font-size:13px;}
+  .result-count{font-family:'Space Mono',monospace;font-size:12px;color:var(--faint);}
+
+  /* ---------- modal ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(4,4,6,.88);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .overlay.open{display:flex;}
+  .modal{max-width:640px;width:100%;background:var(--bg2);border:1px solid var(--cardBorder);border-radius:6px;max-height:85vh;overflow-y:auto;}
+  .modal-media{position:relative;height:210px;background:#0A0B10;}
+  .modal-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .modal-fade{position:absolute;inset:0;background:linear-gradient(0deg,var(--bg2),transparent 60%);}
+  .modal-title{position:absolute;bottom:16px;left:22px;right:50px;font-family:'Oswald',sans-serif;font-size:32px;font-weight:700;color:var(--cream);text-shadow:0 2px 10px rgba(0,0,0,.5);}
+  .modal-close{position:absolute;top:12px;right:12px;background:rgba(7,8,11,.6);border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--cream);}
+  .modal-body{padding:18px 24px 26px;}
+  .modal-meta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:16px;align-items:center;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);}
+  .modal-meta .pill{padding:2px 8px;border-radius:3px;}
+  .modal-desc{font-size:15px;line-height:1.7;color:var(--cream);margin:0;}
+  .modal-cast-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--faint);text-transform:uppercase;}
+  .modal-cast{font-size:13px;color:var(--muted);margin-top:4px;}
+  .modal-playbtn{margin-top:20px;display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#0A0A0C;border:none;border-radius:3px;padding:11px 20px;cursor:pointer;}
+
+  /* ---------- player ---------- */
+  .player{position:fixed;inset:0;background:#000;z-index:100;display:none;flex-direction:column;}
+  .player.open{display:flex;}
+  .player-media{position:relative;flex:1;background:#000;}
+  .player-media video{width:100%;height:100%;object-fit:contain;background:#000;}
+  .player-top{position:absolute;top:0;left:0;right:0;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(0,0,0,.75),transparent);}
+  .player-top-left{display:flex;align-items:center;gap:10px;}
+  .round-btn{background:rgba(7,8,11,.6);border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--cream);}
+  .player-title{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;color:var(--cream);letter-spacing:.3px;}
+  .player-foot{padding:10px 20px;background:var(--bg2);border-top:1px solid var(--cardBorder);font-family:'Space Mono',monospace;font-size:11px;color:var(--faint);}
+
+  svg.icon{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <svg width="36" height="36" viewBox="0 0 100 100">
+        <defs>
+          <radialGradient id="orb" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#FFE9A8"/>
+            <stop offset="45%" stop-color="#F5B400"/>
+            <stop offset="100%" stop-color="#8A5E00"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="50" cy="50" rx="46" ry="20" fill="none" stroke="#1E63E0" stroke-width="6" transform="rotate(35 50 50)" opacity="0.9"/>
+        <ellipse cx="50" cy="50" rx="46" ry="20" fill="none" stroke="#000" stroke-width="9" transform="rotate(-35 50 50)" opacity="0.85"/>
+        <ellipse cx="50" cy="50" rx="46" ry="20" fill="none" stroke="#F5B400" stroke-width="3" transform="rotate(-35 50 50)"/>
+        <circle cx="50" cy="50" r="24" fill="url(#orb)"/>
+      </svg>
+      <h1><span class="gold">PBC</span><span class="blue">&amp;</span><span>.TV</span></h1>
+    </div>
+    <div class="searchwrap">
+      <div class="searchbox">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="searchInput" placeholder="Buscar canal, filme ou série..." />
+      </div>
+      <button class="icon-btn" id="testerToggle" title="Testar um link de vídeo próprio">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="filters" id="typeFilters">
+    <button class="chip active" data-type="todos">Início</button>
+    <button class="chip" data-type="canal">Ao Vivo</button>
+    <button class="chip" data-type="filme">Filmes</button>
+    <button class="chip" data-type="serie">Séries</button>
+    <select id="genreFilter"><option value="todos">Todos os gêneros</option></select>
+  </div>
+
+  <div class="tester" id="testerPanel">
+    <div class="tester-box">
+      <p>Cole aqui um link direto de vídeo (.mp4, .webm ou .ogg) para testar se o player toca — útil pra você experimentar com sua própria fonte, sem precisar mexer no código.</p>
+      <div class="tester-row">
+        <input id="testerInput" placeholder="https://exemplo.com/meuvideo.mp4" />
+        <button class="btn-gold" id="testerPlayBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="#0A0A0C" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          TESTAR
+        </button>
+      </div>
+      <p style="font-family:'Space Mono',monospace;font-size:10px;color:var(--faint);margin:8px 0 0;">
+        Não funciona com links do YouTube, Google Drive ou páginas de sites — precisa ser o arquivo de vídeo direto. Links m3u8 (IPTV) não são suportados por este player simples.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="hero" id="hero">
+  <img id="heroImg" src="" alt="" />
+  <div class="fade"></div>
+  <div class="hero-content">
+    <span class="eyebrow">EM DESTAQUE</span>
+    <h2 id="heroTitle"></h2>
+    <div class="hero-meta">
+      <span class="badge badge-rating" id="heroRating"></span>
+      <span id="heroYear" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);"></span>
+      <span id="heroGenre" class="badge" style="border:1px solid var(--blue);color:var(--blue);background:transparent;"></span>
+    </div>
+    <p class="hero-desc" id="heroDesc"></p>
+    <div class="hero-actions">
+      <button class="btn-cream" id="heroPlayBtn">
+        <svg class="icon" viewBox="0 0 24 24" fill="#0A0A0C" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        ASSISTIR
+      </button>
+      <button class="btn-outline" id="heroInfoBtn">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        DETALHES
+      </button>
+    </div>
+  </div>
+</div>
+
+<main id="mainArea"></main>
+
+<div class="overlay" id="modalOverlay">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<div class="player" id="player">
+  <div class="player-media">
+    <video id="playerVideo" controls autoplay></video>
+    <div class="player-top">
+      <div class="player-top-left">
+        <button class="round-btn" id="playerClose">
+          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <span class="player-title" id="playerTitle"></span>
+        <span id="playerBadges"></span>
+      </div>
+      <button class="round-btn" id="playerMute">
+        <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="player-foot" id="playerFoot"></div>
+</div>
+
+<script>
+/* ===================== DADOS ===================== */
+const SAMPLE_VIDEOS = [
+  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+];
+function videoFor(id){ return SAMPLE_VIDEOS[id % SAMPLE_VIDEOS.length]; }
+function posterFor(kind,id){ return `https://picsum.photos/seed/pbctv-${kind}-${id}/400/580`; }
+
+const MOVIES_SERIES = [
+  {id:1,title:"Trilhas Perdidas",year:1994,type:"filme",genre:"Drama",rating:9.1,dir:"R. Vance",runtime:142,cast:["M. Freeman","T. Robbins"],synopsis:"Dois presos constroem uma amizade improvável dentro dos muros de uma penitenciária, enquanto um deles trama, ao longo de décadas, uma forma silenciosa de recuperar a liberdade."},
+  {id:2,title:"O Círculo de Ferro",year:1972,type:"filme",genre:"Crime",rating:9.2,dir:"F. Coppola",runtime:175,cast:["M. Brando","A. Pacino"],synopsis:"A saga de uma família ligada ao crime organizado acompanha a transição de poder entre um patriarca cauteloso e o filho relutante que herda seu império."},
+  {id:3,title:"Neon Réplica",year:1982,type:"filme",genre:"Ficção Científica",rating:8.4,dir:"R. Scott",runtime:117,cast:["H. Ford","R. Hauer"],synopsis:"Em uma metrópole chuvosa do futuro, um caçador de recompensas persegue androides fugitivos e passa a questionar a fronteira entre humano e artificial."},
+  {id:4,title:"Vórtice Onírico",year:2010,type:"filme",genre:"Ficção Científica",rating:8.8,dir:"C. Nolen",runtime:148,cast:["L. DiCaprio","E. Page"],synopsis:"Um especialista em invadir sonhos aceita uma última missão: plantar uma ideia na mente de um herdeiro, mesmo sabendo dos perigos dos sonhos."},
+  {id:5,title:"Estrada Furiosa",year:2015,type:"filme",genre:"Ação",rating:8.1,dir:"G. Miller",runtime:120,cast:["T. Hardy","C. Theron"],synopsis:"Em um deserto pós-apocalíptico, uma fugitiva e um sobrevivente solitário unem forças contra um tirano que controla a água e o combustível."},
+  {id:6,title:"Marés de Amélie",year:2001,type:"filme",genre:"Romance",rating:8.3,dir:"J-P. Jeunet",runtime:122,cast:["A. Tautou"],synopsis:"Uma garçonete parisiense tímida decide transformar, em pequenos gestos anônimos, a vida solitária das pessoas ao seu redor."},
+  {id:7,title:"Casa dos Espíritos Baixos",year:2018,type:"filme",genre:"Terror",rating:7.6,dir:"A. Aster",runtime:127,cast:["T. Collette"],synopsis:"Após uma perda familiar, segredos hereditários começam a emergir, revelando que o luto de uma casa pode ser mais antigo do que qualquer um imagina."},
+  {id:8,title:"Risadas na Fila 7",year:1999,type:"filme",genre:"Comédia",rating:7.4,dir:"M. Judge",runtime:89,cast:["R. Livingston"],synopsis:"Três colegas de escritório entediados decidem sabotar discretamente a empresa em que trabalham, com resultados cada vez mais fora de controle."},
+  {id:9,title:"O Labirinto do Fauno",year:2006,type:"filme",genre:"Fantasia",rating:8.2,dir:"G. del Toro",runtime:118,cast:["I. Baquero"],synopsis:"Na Espanha do pós-guerra, uma menina descobre um reino subterrâneo de criaturas fantásticas que espelha os horrores do mundo ao seu redor."},
+  {id:10,title:"Cidade Espelhada",year:2019,type:"filme",genre:"Suspense",rating:7.9,dir:"B. Peele",runtime:116,cast:["L. Nyong'o"],synopsis:"Uma família em férias na praia se depara com versões idênticas de si mesma, vindas de um lugar esquecido, decididas a tomar seu lugar."},
+  {id:12,title:"Reação em Cadeia",year:2008,type:"filme",genre:"Ação",rating:9.0,dir:"C. Nolen",runtime:152,cast:["C. Bale","H. Ledger"],synopsis:"Um justiceiro mascarado enfrenta um agente do caos que testa os limites morais de uma cidade inteira através de dilemas cada vez mais cruéis."},
+  {id:14,title:"Sala dos Ecos",year:2014,type:"filme",genre:"Suspense",rating:8.6,dir:"D. Fincher",runtime:149,cast:["B. Affleck","R. Pike"],synopsis:"No aniversário de casamento de um casal em crise, o desaparecimento repentino da esposa expõe camadas de mentiras que ninguém esperava encontrar."},
+  {id:35,title:"Baile das Máscaras",year:2019,type:"filme",genre:"Comédia",rating:8.5,dir:"B. Joon-ho",runtime:132,cast:["Song Kang-ho"],synopsis:"Uma família de poucos recursos se infiltra, um a um, na rotina de uma família rica, até que um segredo escondido na casa ameaça expor todos."},
+  {id:36,title:"Constelação Partida",year:2014,type:"filme",genre:"Ficção Científica",rating:8.6,dir:"C. Nolen",runtime:169,cast:["M. McConaughey","A. Hathaway"],synopsis:"Diante da degradação da Terra, um piloto se junta a uma missão espacial em busca de um novo lar, sabendo que talvez nunca reveja a própria filha."},
+
+  {id:16,title:"Laboratório do Caos",year:2008,type:"serie",genre:"Crime",rating:9.4,creator:"V. Gilligan",seasons:5,cast:["B. Cranston","A. Paul"],synopsis:"Um professor de química diagnosticado com uma doença grave entra no submundo da produção clandestina, e a decisão muda irreversivelmente quem ele é."},
+  {id:17,title:"Trono de Cinzas",year:2011,type:"serie",genre:"Fantasia",rating:9.0,creator:"D. Benioff",seasons:8,cast:["E. Clarke","K. Harington"],synopsis:"Casas rivais disputam o controle de um continente dividido, enquanto uma ameaça antiga desperta muito além da muralha que deveria contê-la."},
+  {id:18,title:"Coisas do Outro Mundo",year:2016,type:"serie",genre:"Ficção Científica",rating:8.7,creator:"Irmãos Duffer",seasons:5,cast:["M. Brown","F. Wolfhard"],synopsis:"Em uma cidade pequena dos anos 80, o desaparecimento de um garoto revela um laboratório secreto e uma dimensão paralela cheia de perigos."},
+  {id:19,title:"Escritório Improvável",year:2005,type:"serie",genre:"Comédia",rating:8.9,creator:"G. Daniels",seasons:9,cast:["S. Carell","J. Krasinski"],synopsis:"Um documentário fictício acompanha o cotidiano absurdo de uma equipe de vendas em uma empresa de papel, comandada por um chefe desastrado."},
+  {id:21,title:"Herança Podre",year:2018,type:"serie",genre:"Drama",rating:8.8,creator:"J. Armstrong",seasons:4,cast:["B. Strong","J. Braun"],synopsis:"Os herdeiros de um magnata da mídia disputam entre si o controle do império familiar, revelando o quanto ambição pode corroer laços de sangue."},
+  {id:22,title:"Cidade sem Lei",year:2002,type:"serie",genre:"Crime",rating:9.3,creator:"D. Simon",seasons:5,cast:["D. Pearce","W. Williams"],synopsis:"Um retrato coral de uma cidade portuária mostra como tráfico, política e imprensa se entrelaçam nas engrenagens do crime organizado."},
+  {id:23,title:"Investigações Nebulosas",year:2014,type:"serie",genre:"Suspense",rating:8.5,creator:"N. Pizzolatto",seasons:4,cast:["M. McConaughey","W. Harrelson"],synopsis:"Dois detetives com métodos e visões de mundo opostos reabrem, anos depois, um caso de assassinato ritual que nunca deixou de assombrá-los."},
+  {id:25,title:"Consultório 4B",year:1999,type:"serie",genre:"Comédia",rating:8.7,creator:"D. Chase",seasons:6,cast:["J. Gandolfini"],synopsis:"Um chefe do crime organizado da Nova Jersey busca terapia para lidar com ataques de pânico, sem nunca revelar totalmente a natureza do seu trabalho."},
+  {id:28,title:"Papel e Máscara",year:2017,type:"serie",genre:"Crime",rating:8.2,creator:"Á. Pina",seasons:5,cast:["Ú. Corberó","Á. Morte"],synopsis:"Um grupo de assaltantes cuidadosamente selecionado planeja o roubo perfeito à casa da moeda, escondidos atrás de máscaras e nomes de cidades."},
+];
+
+const CHANNELS = [
+  {id:101,title:"Estádio 1",genre:"Esportes",program:"Campeonato Regional — ao vivo agora"},
+  {id:102,title:"Jornal Central",genre:"Notícias",program:"Edição da noite"},
+  {id:103,title:"Tela Kids",genre:"Infantil",program:"Aventuras do Bosque Azul"},
+  {id:104,title:"Documenta+",genre:"Documentário",program:"Oceanos Profundos"},
+  {id:105,title:"Comédia Non-Stop",genre:"Comédia",program:"Maratona de clássicos"},
+  {id:106,title:"Ação 24h",genre:"Ação",program:"Sessão dupla de ação"},
+  {id:107,title:"MúsicaBeat",genre:"Música",program:"Top 20 da semana"},
+  {id:108,title:"CineClássico",genre:"Drama",program:"Clássicos em preto e branco"},
+  {id:109,title:"GameZone",genre:"Games",program:"Transmissão de torneio ao vivo"},
+  {id:110,title:"Suspense TV",genre:"Suspense",program:"Noite de mistério"},
+  {id:111,title:"Vida Real",genre:"Reality",program:"Bastidores — episódio novo"},
+  {id:112,title:"Rota Sertaneja",genre:"Música",program:"Show ao vivo"},
+  {id:113,title:"Sabor na Panela",genre:"Culinária",program:"Receitas de inverno ao vivo"},
+  {id:114,title:"Mundo Selvagem",genre:"Natureza",program:"Predadores da savana"},
+  {id:115,title:"Cine Maratona",genre:"Filmes 24h",program:"Sessão da tarde sem parar"},
+  {id:116,title:"Série Non-Stop",genre:"Séries 24h",program:"Maratona de episódios"},
+  {id:117,title:"Rota das Estradas",genre:"Automotivo",program:"Especial motores clássicos"},
+  {id:118,title:"Aprender+",genre:"Educativo",program:"Curso rápido de história"},
+  {id:119,title:"Fé & Vida",genre:"Variedades",program:"Programa da manhã"},
+  {id:120,title:"Novela das 8",genre:"Novela",program:"Capítulo de hoje — ao vivo"},
+];
+
+const PUBLIC_DOMAIN_RAW = [
+  {id:901,title:"A Viagem à Lua",year:1902,genre:"Ficção Científica",dir:"Georges Méliès",runtime:13,cast:["Georges Méliès"],synopsis:"Um grupo de astrônomos viaja até a Lua dentro de uma cápsula disparada por canhão, explora sua superfície e escapa de habitantes lunares antes de voltar à Terra. Considerado o primeiro filme de ficção científica da história do cinema.",archiveId:"ATripToTheMoonGeorgeMelies"},
+  {id:902,title:"Nosferatu",year:1922,genre:"Terror",dir:"F. W. Murnau",runtime:94,cast:["Max Schreck"],synopsis:"Um agente imobiliário viaja até a Transilvânia para fechar negócio com o misterioso Conde Orlok, sem saber que está diante de uma criatura amaldiçoada que trará a peste para sua cidade natal. Clássico fundador do cinema de terror.",archiveId:"Nosferatu_DVD_quality"},
+  {id:903,title:"A Primeira Página",year:1940,genre:"Comédia",dir:"Howard Hawks",runtime:92,cast:["Cary Grant","Rosalind Russell"],synopsis:"Um editor de jornal usa todos os truques possíveis para impedir que sua ex-mulher, uma repórter talentosa, se case novamente e abandone a profissão, envolvendo os dois em uma cobertura jornalística cada vez mais alucinante.",archiveId:"HisGirlFriday"},
+  {id:904,title:"A Noite dos Mortos-Vivos",year:1968,genre:"Terror",dir:"George A. Romero",runtime:96,cast:["Duane Jones","Judith O'Dea"],synopsis:"Um grupo de estranhos se refugia em uma casa de fazenda isolada enquanto os mortos voltam à vida do lado de fora, faminto por carne viva. O filme que fundou o gênero moderno de zumbis.",archiveId:"night_of_the_living_dead"},
+];
+
+const CH = CHANNELS.map(c=>({...c,type:"canal",videoUrl:videoFor(c.id),poster:posterFor("ch",c.id)}));
+const MS = MOVIES_SERIES.map(d=>({...d,videoUrl:videoFor(d.id),poster:posterFor(d.type,d.id)}));
+const PD = PUBLIC_DOMAIN_RAW.map(d=>({...d,type:"filme",pd:true,poster:`https://archive.org/services/img/${d.archiveId}`,videoUrl:videoFor(d.id)}));
+
+const DATA = [...CH, ...MS, ...PD];
+const GENRES = [...new Set(DATA.map(d=>d.genre))].sort();
+const FEATURED = DATA.find(d=>d.id===17 && d.type==="serie") || DATA.find(d=>d.type==="serie");
+
+/* ===================== ESTADO ===================== */
+let query="", typeFilter="todos", genreFilter="todos";
+
+/* ===================== HELPERS ===================== */
+function esc(s){ return (s+"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function typeTagHTML(type){
+  const map = { filme:["Filme","var(--gold)"], serie:["Série","var(--blue)"], canal:["Canal","var(--red)"] };
+  const [label,color] = map[type];
+  return `<span class="badge badge-type" style="background:${color};">${label}</span>`;
+}
+function ratingOrPdHTML(item){
+  if(item.type==="canal") return `<span class="badge badge-live"><span class="dot"></span>AO VIVO</span>`;
+  if(item.pd) return `<span class="badge badge-pd">GRÁTIS · REAL</span>`;
+  return `<span class="badge badge-rating">★ ${item.rating.toFixed(1)}</span>`;
+}
+
+function cardHTML(item){
+  return `
+  <div class="card" data-open="${item.type}-${item.id}">
+    <div class="card-media">
+      <img src="${item.poster}" alt="${esc(item.title)}" onerror="this.style.display='none'" loading="lazy" />
+      <div class="card-shade"></div>
+      <div class="card-top-right">${ratingOrPdHTML(item)}</div>
+      <div class="card-top-left">${typeTagHTML(item.type)}</div>
+      <button class="card-play" style="background:${item.type==='filme'?'var(--gold)':item.type==='serie'?'var(--blue)':'var(--red)'}" data-play="${item.type}-${item.id}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="#0A0A0C" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </button>
+      <div class="card-title">${esc(item.title)}</div>
+    </div>
+    <div class="card-info">
+      <span>${item.type==="canal"?esc(item.genre):item.year}</span>
+      <span class="sep">·</span>
+      <span class="trunc">${item.type==="canal"?esc(item.program):esc(item.genre)}</span>
+    </div>
+  </div>`;
+}
+
+function rowHTML(title,items){
+  if(items.length===0) return "";
+  const id = "row_"+title.replace(/\W+/g,"_");
+  return `
+  <section class="row-section">
+    <div class="row-head">
+      <h3>${esc(title)}</h3>
+      <div class="row-nav">
+        <button data-scroll="${id}" data-dir="-1">‹</button>
+        <button data-scroll="${id}" data-dir="1">›</button>
+      </div>
+    </div>
+    <div class="row-scroll" id="${id}">
+      ${items.map(cardHTML).join("")}
+    </div>
+  </section>`;
+}
+
+function findItem(key){
+  const [type,idStr] = key.split("-");
+  const id = Number(idStr);
+  return DATA.find(d=>d.type===type && d.id===id);
+}
+
+/* ===================== RENDER ===================== */
+function renderHero(){
+  document.getElementById("heroImg").src = FEATURED.poster;
+  document.getElementById("heroImg").alt = FEATURED.title;
+  document.getElementById("heroTitle").textContent = FEATURED.title;
+  document.getElementById("heroRating").innerHTML = `★ ${FEATURED.rating.toFixed(1)}`;
+  document.getElementById("heroYear").textContent = FEATURED.year;
+  document.getElementById("heroGenre").textContent = FEATURED.genre;
+  document.getElementById("heroDesc").textContent = FEATURED.synopsis;
+}
+
+function renderGenreSelect(){
+  const sel = document.getElementById("genreFilter");
+  GENRES.forEach(g=>{
+    const opt = document.createElement("option");
+    opt.value = g; opt.textContent = g;
+    sel.appendChild(opt);
+  });
+}
+
+function renderMain(){
+  const main = document.getElementById("mainArea");
+  const isFiltering = query.trim()!=="" || typeFilter!=="todos" || genreFilter!=="todos";
+  document.getElementById("hero").style.display = isFiltering ? "none" : "block";
+
+  if(isFiltering){
+    let list = DATA.filter(d=>{
+      const mQ = d.title.toLowerCase().includes(query.toLowerCase());
+      const mT = typeFilter==="todos" || d.type===typeFilter;
+      const mG = genreFilter==="todos" || d.genre===genreFilter;
+      return mQ && mT && mG;
+    }).sort((a,b)=>(b.rating||0)-(a.rating||0));
+
+    main.innerHTML = `
+      <span class="result-count">${list.length} título${list.length!==1?"s":""} encontrado${list.length!==1?"s":""}</span>
+      ${list.length===0
+        ? `<div class="empty"><h4>Sala vazia</h4><p>Nenhum título combina com esse filtro. Tente outra busca.</p></div>`
+        : `<div class="grid">${list.map(cardHTML).join("")}</div>`}
+    `;
+  } else {
+    const channels = DATA.filter(d=>d.type==="canal");
+    const publicDomain = DATA.filter(d=>d.pd);
+    const movies = DATA.filter(d=>d.type==="filme" && !d.pd).sort((a,b)=>b.rating-a.rating);
+    const series = DATA.filter(d=>d.type==="serie").sort((a,b)=>b.rating-a.rating);
+    main.innerHTML =
+      rowHTML("Canais Ao Vivo", channels) +
+      rowHTML("Clássicos Grátis (Domínio Público, filmes reais)", publicDomain) +
+      rowHTML("Filmes em Alta", movies) +
+      rowHTML("Séries em Alta", series);
+  }
+  attachCardHandlers();
+}
+
+function attachCardHandlers(){
+  document.querySelectorAll("[data-open]").forEach(el=>{
+    el.addEventListener("click",()=> openModal(findItem(el.dataset.open)));
+  });
+  document.querySelectorAll("[data-play]").forEach(el=>{
+    el.addEventListener("click",(e)=>{ e.stopPropagation(); playItem(findItem(el.dataset.play)); });
+  });
+  document.querySelectorAll("[data-scroll]").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const track = document.getElementById(el.dataset.scroll);
+      track.scrollBy({left: Number(el.dataset.dir)*560, behavior:"smooth"});
+    });
+  });
+}
+
+/* ===================== MODAL ===================== */
+function openModal(item){
+  const box = document.getElementById("modalBox");
+  const accent = item.type==="filme"?"var(--gold)":item.type==="serie"?"var(--blue)":"var(--red)";
+  box.innerHTML = `
+    <div class="modal-media">
+      <img src="${item.poster}" alt="${esc(item.title)}" onerror="this.style.display='none'" />
+      <div class="modal-fade"></div>
+      <div class="modal-title">${esc(item.title)}</div>
+      <button class="modal-close" id="modalCloseBtn">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-meta">
+        ${ratingOrPdHTML(item)}
+        ${item.type!=="canal" ? `<span>⏱ ${item.type==="filme"?item.runtime+" min":item.seasons+" temporada"+(item.seasons>1?"s":"")}</span>`:""}
+        ${item.type!=="canal" ? `<span>👤 ${esc(item.type==="filme"?item.dir:item.creator)}</span>`:""}
+        <span class="pill" style="border:1px solid ${accent};color:${accent};">${esc(item.genre)}</span>
+      </div>
+      <p class="modal-desc">${item.type==="canal" ? `Agora exibindo: <strong>${esc(item.program)}</strong>` : esc(item.synopsis)}</p>
+      ${item.type!=="canal" ? `<div style="margin-top:16px;"><div class="modal-cast-label">Elenco</div><p class="modal-cast">${esc(item.cast.join(", "))}</p></div>` : ""}
+      <button class="modal-playbtn" style="background:${accent};" id="modalPlayBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="#0A0A0C" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        ${item.type==="canal" ? "ASSISTIR AO VIVO" : "ASSISTIR AGORA"}
+      </button>
+    </div>
+  `;
+  document.getElementById("modalCloseBtn").addEventListener("click", closeModal);
+  document.getElementById("modalPlayBtn").addEventListener("click", ()=>{ closeModal(); playItem(item); });
+  document.getElementById("modalOverlay").classList.add("open");
+}
+function closeModal(){ document.getElementById("modalOverlay").classList.remove("open"); }
+document.getElementById("modalOverlay").addEventListener("click",(e)=>{
+  if(e.target.id==="modalOverlay") closeModal();
+});
+
+/* ===================== PLAYER ===================== */
+function playItem(item){
+  const player = document.getElementById("player");
+  const video = document.getElementById("playerVideo");
+  document.getElementById("playerTitle").textContent = item.title;
+  let badges = "";
+  if(item.type==="canal") badges += `<span class="badge badge-live" style="margin-left:8px;"><span class="dot"></span>AO VIVO</span>`;
+  if(item.pd) badges += `<span class="badge badge-pd" style="margin-left:8px;">GRÁTIS · REAL</span>`;
+  document.getElementById("playerBadges").innerHTML = badges;
+  document.getElementById("playerFoot").textContent = item.pd
+    ? "Filme real em domínio público · reprodução de demonstração neste player"
+    : item.type==="canal"
+      ? `Transmitindo: ${item.program} · conteúdo de demonstração`
+      : "Reprodução de demonstração";
+  video.src = item.videoUrl;
+  video.muted = false;
+  player.classList.add("open");
+  video.play().catch(()=>{});
+}
+document.getElementById("playerClose").addEventListener("click",()=>{
+  const player = document.getElementById("player");
+  const video = document.getElementById("playerVideo");
+  video.pause(); video.src="";
+  player.classList.remove("open");
+});
+document.getElementById("playerMute").addEventListener("click",()=>{
+  const video = document.getElementById("playerVideo");
+  video.muted = !video.muted;
+});
+
+/* ===================== TESTER ===================== */
+document.getElementById("testerToggle").addEventListener("click",()=>{
+  document.getElementById("testerPanel").classList.toggle("open");
+  document.getElementById("testerToggle").classList.toggle("active");
+});
+document.getElementById("testerPlayBtn").addEventListener("click",()=>{
+  const url = document.getElementById("testerInput").value.trim();
+  if(url) playItem({title:"Teste de reprodução", type:"filme", videoUrl:url, program:""});
+});
+
+/* ===================== FILTROS ===================== */
+document.getElementById("searchInput").addEventListener("input",(e)=>{ query=e.target.value; renderMain(); });
+document.getElementById("genreFilter").addEventListener("change",(e)=>{ genreFilter=e.target.value; renderMain(); });
+document.getElementById("typeFilters").querySelectorAll(".chip").forEach(chip=>{
+  chip.addEventListener("click",()=>{
+    typeFilter = chip.dataset.type;
+    document.querySelectorAll("#typeFilters .chip").forEach(c=>c.classList.remove("active"));
+    chip.classList.add("active");
+    renderMain();
+  });
+});
+document.getElementById("heroPlayBtn").addEventListener("click",()=> playItem(FEATURED));
+document.getElementById("heroInfoBtn").addEventListener("click",()=> openModal(FEATURED));
+
+/* ===================== INIT ===================== */
+renderGenreSelect();
+renderHero();
+renderMain();
+</script>
+</body>
+</html>
